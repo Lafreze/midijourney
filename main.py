@@ -16,6 +16,7 @@ from .mjapi import _mjApi
 from .mjcache import _imgCache
 from channel.chat_message import ChatMessage
 from config import conf
+import openai
 from langdetect import detect
 def check_prefix(content, prefix_list):
     if not prefix_list:
