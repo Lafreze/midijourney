@@ -162,6 +162,67 @@ class MidJourney(Plugin):
             return detect(text) == 'en'
         except:
             return False
+    def get_translation(self, iq):
+        print(iq)
+        last_match = ""
+        api_key = self.openai_api_key
+        model = "gpt-3.5-turbo-0613"
+        if not self.is_english(iq) and iq is not None:
+            try:
+                print("input:",iq)
+                if "--" in iq:
+                    pattern_setting = iq.split("--")
+                    for prompt in pattern_setting[1:]:
+                        last_match += f"--{prompt}"
+                    iq = pattern_setting[0]
+                print("prompt",iq)
+                message2 = f"""
+                As a prompt generator for a generative AI called "Midjourney", you will create image prompts for the AI to visualize. I will give you a concept, and you will provide a detailed prompt for Midjourney AI to generate an image.
+
+                Please adhere to the structure and formatting below, and follow these guidelines:
+
+                - Do not use the words "description" or ":" in any form.
+                - Do not place a comma between [ar] and [v].
+                - Write each prompt in one line without using return.
+                - Only provide the resulting text:.
+
+                Structure:
+                [1] = {iq}
+                [2] = a detailed description of [1] with specific imagery details.
+                [3] = a detailed description of the scene's environment.
+                [4] = a detailed description of the scene's mood, feelings, and atmosphere.
+                [5] = A style (e.g. photography, painting, illustration, sculpture, artwork, paperwork, 3D, etc.) for [1].
+                [6] = A description of how [5] will be executed (e.g. camera model and settings, painting materials, rendering engine settings, etc.)
+                [ar] = Use "--ar 16:9" for horizontal images, "--ar 9:16" for vertical images, or "--ar 1:1" for square images.
+                [v] = Use "--niji" for Japanese art style, or "--v 5" for other styles.
+
+                Formatting: 
+                Follow this prompt structure: "[1], [2], [3], [4], [5], [6], [ar] [v]".
+
+                Your task: Create only 1 prompt [1].
+
+                - Write your prompt in English.
+                - Do not describe unreal concepts as "real" or "photographic".
+                - Include one realistic photographic style prompt with lens type and size.
+
+                Example:
+                A stunning Halo Reach landscape with a Spartan on a hilltop, lush green forests surround them, clear sky, distant city view, focusing on the Spartan's majestic pose, intricate armor, and weapons, Artwork, oil painting on canvas, --ar 16:9 --v 5
+                """
+                message1 = f"Translate the following text delimited by 「」 to English and only provide the resulting text: 「{iq}」"
+                prompt = [{"role": "user", "content": message2}] if len(iq) < 10 else [{"role": "user", "content": message1}]
+                response = openai.ChatCompletion.create(
+                            api_key=api_key, model=model,
+                                messages=prompt
+                            )
+                print("translated:",response["choices"][0]["message"]["content"])
+                iq = response["choices"][0]["message"]["content"].replace("\"","").strip()
+                if len(last_match) > 0:
+                    iq = f"{iq} {last_match}"
+                print("Final prompt:",iq)
+                print('#tokens:',response['usage']['total_tokens'])
+            except Exception as e:
+                print(e)
+        return iq
     def on_handle_context(self, e_context: EventContext):
         if e_context["context"].type not in [
             ContextType.TEXT,
@@ -172,8 +233,6 @@ class MidJourney(Plugin):
         channel = e_context['channel']
         context = e_context['context']
         content = context.content
-        api_key = self.openai_api_key
-        model = "gpt-3.5-turbo-0613"
         msg: ChatMessage = context["msg"]
         sessionid = context["session_id"]
         isgroup = e_context["context"].get("isgroup", False)
@@ -227,63 +286,7 @@ class MidJourney(Plugin):
             pprefix, pq = check_prefix(content, self.pad_prefix)
             bprefix, bq = check_prefix(content, self.blend_prefix)
             dprefix, dq = check_prefix(content, self.describe_prefix)
-            print(iq)
-            last_match = ""
-            if not self.is_english(iq) and iq is not None:
-                try:
-                    print("input:",iq)
-                    if "--" in iq:
-                        pattern_setting = iq.split("--")
-                        for prompt in pattern_setting[1:]:
-                            last_match += f"--{prompt}"
-                        iq = pattern_setting[0]
-                    print("prompt",iq)
-                    message2 = f"""
-                    As a prompt generator for a generative AI called "Midjourney", you will create image prompts for the AI to visualize. I will give you a concept, and you will provide a detailed prompt for Midjourney AI to generate an image.
-
-                    Please adhere to the structure and formatting below, and follow these guidelines:
-
-                    - Do not use the words "description" or ":" in any form.
-                    - Do not place a comma between [ar] and [v].
-                    - Write each prompt in one line without using return.
-                    - Only provide the resulting text:.
-
-                    Structure:
-                    [1] = {iq}
-                    [2] = a detailed description of [1] with specific imagery details.
-                    [3] = a detailed description of the scene's environment.
-                    [4] = a detailed description of the scene's mood, feelings, and atmosphere.
-                    [5] = A style (e.g. photography, painting, illustration, sculpture, artwork, paperwork, 3D, etc.) for [1].
-                    [6] = A description of how [5] will be executed (e.g. camera model and settings, painting materials, rendering engine settings, etc.)
-                    [ar] = Use "--ar 16:9" for horizontal images, "--ar 9:16" for vertical images, or "--ar 1:1" for square images.
-                    [v] = Use "--niji" for Japanese art style, or "--v 5" for other styles.
-
-                    Formatting: 
-                    Follow this prompt structure: "[1], [2], [3], [4], [5], [6], [ar] [v]".
-
-                    Your task: Create only 1 prompt [1].
-
-                    - Write your prompt in English.
-                    - Do not describe unreal concepts as "real" or "photographic".
-                    - Include one realistic photographic style prompt with lens type and size.
-
-                    Example:
-                    A stunning Halo Reach landscape with a Spartan on a hilltop, lush green forests surround them, clear sky, distant city view, focusing on the Spartan's majestic pose, intricate armor, and weapons, Artwork, oil painting on canvas, --ar 16:9 --v 5
-                    """
-                    message1 = f"Translate the following text delimited by 「」 to English and only provide the resulting text: 「{iq}」"
-                    prompt = [{"role": "user", "content": message2}] if len(iq) < 10 else [{"role": "user", "content": message1}]
-                    response = openai.ChatCompletion.create(
-                                api_key=api_key, model=model,
-                                    messages=prompt
-                                )
-                    print("translated:",response["choices"][0]["message"]["content"])
-                    iq = response["choices"][0]["message"]["content"].replace("\"","").strip()
-                    if len(last_match) > 0:
-                        iq = f"{iq} {last_match}"
-                    print("Final prompt:",iq)
-                    print('#tokens:',response['usage']['total_tokens'])
-                except Exception as e:
-                    print(e)
+            
             if content == "/mjhp" or content == "/mjhelp" or content == "/mj-help":
                 reply = Reply(ReplyType.INFO, self.mj.help_text())
                 e_context["reply"] = reply
@@ -291,6 +294,7 @@ class MidJourney(Plugin):
                 return
             elif iprefix == True:
                 self.env_detection(e_context)
+                iq = self.get_translation(iq)
                 reply = self.imagine(iq, "", channel, context)
                 if sessionid in self.sessions:
                     self.sessions[sessionid].reset()
@@ -312,6 +316,7 @@ class MidJourney(Plugin):
                 if not pq:
                     reply = Reply(ReplyType.TEXT, "✨ 垫图模式\n✏ 请在指令后输入要绘制的描述文字")
                 else:
+                    pq = self.get_translation(pq)
                     self.sessions[sessionid] = _imgCache(sessionid, "imagine", pq)
                     reply = Reply(ReplyType.TEXT, "✨ 垫图模式\n✏ 请再发送一张图片")
                 e_context["reply"] = reply
