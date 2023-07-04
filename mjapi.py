@@ -124,7 +124,7 @@ class _mjApi:
             msg += f"ID: {rj['id']}\n"
             msg += f"进度：{rj['progress']}\n"
             msg += f"状态：{self.status(status)}\n"
-            msg += f"内容：{rj['prompt']}\n"
+            # msg += f"内容：{rj['prompt']}\n"
             msg += f"描述：{rj['description']}\n"
             if rj['failReason']:
                 msg += f"失败原因：{rj['failReason']}\n"
