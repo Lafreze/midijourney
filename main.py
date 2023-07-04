@@ -248,7 +248,8 @@ class MidJourney(Plugin):
                 img_cache = self.sessions[sessionid].get_cache()
             
             # 识别图片
-            if (not isgroup and not img_cache) or (not isgroup and not img_cache["instruct"]) or (img_cache and img_cache["instruct"] == "describe"):
+            # if (not isgroup and not img_cache) or (not isgroup and not img_cache["instruct"]) or (img_cache and img_cache["instruct"] == "describe"):
+            if img_cache and img_cache["instruct"] == "describe":
                 self.env_detection(e_context)
                 reply = self.describe(base64, channel, context)
                 if sessionid in self.sessions:
