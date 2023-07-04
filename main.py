@@ -172,6 +172,8 @@ class MidJourney(Plugin):
         channel = e_context['channel']
         context = e_context['context']
         content = context.content
+        api_key = self.openai_api_key
+        model = "gpt-3.5-turbo-0613"
         msg: ChatMessage = context["msg"]
         sessionid = context["session_id"]
         isgroup = e_context["context"].get("isgroup", False)
