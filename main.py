@@ -82,15 +82,7 @@ class MidJourney(Plugin):
         if os.environ.get("mj_url", None):
             logger.info("使用的是环境变量配置")
             try:
-                if not self.mj_url or not self.mj_api_secret:
-                    if not self.mj_url:
-                        self.mj_url = conf().get("mj_url", "") 
-                    if self.mj_url and not self.mj_api_secret:
-                        self.mj_api_secret = conf().get("mj_api_secret", "") 
-                    if not self.openai_api_key:
-                        self.openai_api_key = conf().get("open_ai_api_key", "")
                 self.handlers[Event.ON_HANDLE_CONTEXT] = self.on_handle_context
-                logger.info("[MJ] inited. mj_url={} mj_api_secret={} imagine_prefix={} fetch_prefix={}".format(self.mj_url, self.mj_api_secret, self.imagine_prefix, self.fetch_prefix))
             except Exception as e:
                 if isinstance(e, FileNotFoundError):
                     logger.warn(f"[MJ] init failed, config.json not found.")
@@ -100,6 +92,7 @@ class MidJourney(Plugin):
             gconf = {
                 "mj_url": os.environ.get("mj_url", ""),
                 "mj_api_secret": os.environ.get("mj_api_secret", ""),
+                "openai_api_key": os.environ.get("openai_api_key", ""),
                 "imagine_prefix": os.environ.get("imagine_prefix", "[\"/i\", \"/mj\", \"/imagine\", \"/img\"]"),
                 "fetch_prefix": os.environ.get("fetch_prefix", "[\"/f\", \"/fetch\"]"),
                 "up_prefix": os.environ.get("up_prefix", "[\"/u\", \"/up\"]"),
@@ -113,12 +106,20 @@ class MidJourney(Plugin):
         print(gconf)
         if gconf["mj_url"] == "":
             logger.info("[MJ] 未设置[mj_url]，请前往环境变量进行配置或在该插件目录下的config.json进行配置。")
+        if not gconf["mj_url"] or not gconf["mj_api_secret"]:
+            if not self.mj_url:
+                gconf["mj_url"] = conf().get("mj_url", "") 
+            if gconf["mj_url"] and not gconf["mj_api_secret"]:
+                gconf["mj_api_secret"] = conf().get("mj_api_secret", "") 
+            if not gconf["openai_api_key"]:
+                gconf["openai_api_key"] = conf().get("open_ai_api_key", "")
 
         # 重新写入配置文件
         write_file(config_path, gconf)
         
         self.mj_url = gconf["mj_url"]
         self.mj_api_secret = gconf["mj_api_secret"]
+        self.openai_api_key = gconf["openai_api_key"]
 
         if not gconf["imagine_prefix"]:
             self.imagine_prefix = ["/mj", "/imagine", "/img"]
