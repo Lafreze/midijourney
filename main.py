@@ -107,7 +107,7 @@ class MidJourney(Plugin):
         if gconf["mj_url"] == "":
             logger.info("[MJ] 未设置[mj_url]，请前往环境变量进行配置或在该插件目录下的config.json进行配置。")
         if not gconf["mj_url"] or not gconf["mj_api_secret"]:
-            if not self.mj_url:
+            if not gconf["mj_url"]:
                 gconf["mj_url"] = conf().get("mj_url", "") 
             if gconf["mj_url"] and not gconf["mj_api_secret"]:
                 gconf["mj_api_secret"] = conf().get("mj_api_secret", "") 
