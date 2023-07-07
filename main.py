@@ -475,7 +475,9 @@ class MidJourney(Plugin):
         return reply
     
     def get_f_img(self, id, channel, context):
-        status2, msg, imageUrl = self.mj.get_f_img(id)
+        input_content = context.content
+        status2, msg, imageUrl = self.mj.get_f_img(id,input_content)
+        
         if status2:
             if imageUrl:
                 self.sendMsg(msg, channel, context)
