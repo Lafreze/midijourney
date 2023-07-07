@@ -142,7 +142,7 @@ class _mjApi:
             return False, "查询失败", None
     
     # 轮询获取任务结果
-    def get_f_img(self, id):
+    def get_f_img(self, id, input_content):
         try:
             url = self.baseUrl + f"/mj/task/{id}/fetch"
             status = ""
@@ -177,7 +177,7 @@ class _mjApi:
                     msg = "🎨 重新绘制成功\n"
                 msg += f"📨 ID: {id}\n"
                 msg += f"✨ 内容: {rj['prompt']}\n"
-                msg += f"✨ 描述：{rj['description']}\n"
+                msg += f"✨ 描述：{input_content}\n"
                 if action == "IMAGINE" or action == "BLEND" or action == "REROLL":
                     msg += f"🪄 放大 U1～U4，变换 V1～V4：使用[{self.up_prefix[0]} + 任务ID\n"
                     msg += f"✏ 例如：{self.up_prefix[0]} {id} U1\n"
