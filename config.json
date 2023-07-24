@@ -1,5 +1,5 @@
 {
-    "mj_url": "https://midjourney-proxy-wechatgpt.zeabur.app",
+    "mj_url": "midjourney-proxy-production-e7f6.up.railway.app",
     "mj_api_secret": "",
     "openai_api_key": "",
     "imagine_prefix": "[\"/i\", \"/mj\", \"/imagine\", \"/img\"]",
