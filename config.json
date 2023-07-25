@@ -1,6 +1,5 @@
 {
     "mj_url": "midjourney-proxy-production-4d70.up.railway.app",
-    "openai_api_key": "",
     "mj_api_secret": "",
     "mj_tip": true,
     "mj_admin_password": "",
