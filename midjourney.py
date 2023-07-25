@@ -15,7 +15,8 @@ from lib.itchat.content import *
 from .mjapi import _mjApi
 from .mjcache import _imgCache
 from .ctext import *
-
+import openai
+import openai.error
 
 @plugins.register(
     name="MidJourney",
