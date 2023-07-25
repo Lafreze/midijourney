@@ -102,10 +102,7 @@ class MidJourney(Plugin):
         else:
             self.temp_password = None
 
-        if gconf["open_ai_api_key"] == "":
-            self.openai_api_key = conf().get("open_ai_api_key", "")
-        else:
-            self.openai_api_key = gconf["open_ai_api_key"]
+        self.openai_api_key = conf().get("open_ai_api_key", "")
 
         # 读取和写入配置文件
         for key, value in gconf.items():
