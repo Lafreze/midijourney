@@ -395,7 +395,7 @@ class MidJourney(Plugin):
             img_cache = self.sessions[self.sessionid].get_cache()
 
         # 识图模式
-        if (not self.isgroup and not img_cache) or (not self.isgroup and not img_cache["instruct"]) or (img_cache and img_cache["instruct"] == "describe"):
+        if img_cache and img_cache["instruct"] == "describe": #(not self.isgroup and not img_cache) or (not self.isgroup and not img_cache["instruct"]) or (img_cache and img_cache["instruct"] == "describe"):
             # 环境检测
             env = env_detection(self, e_context)
             if not env:
